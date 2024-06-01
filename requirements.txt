@@ -3,3 +3,5 @@ webdriver-manager
 pytest
 pytest-dotenv
 pytest-xdist
+allure-pytest
+pytest-html
