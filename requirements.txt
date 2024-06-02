@@ -5,3 +5,5 @@ pytest-dotenv
 pytest-xdist
 allure-pytest
 pytest-html
+
+pydantic-settings

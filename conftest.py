@@ -1,5 +1,5 @@
 import pytest
-from saucedemo.utils.browser import get_browser
+from saucedemo.config.browser import get_browser
 import allure
 
 

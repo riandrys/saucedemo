@@ -4,6 +4,15 @@ addopts = "--html=reports/report.html --alluredir=reports/allure-results"
 env_files = [".env"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "add_cart: Tests adding products to the cart.",
+    "full_checkout: Tests that run a full start-to-finish checkout.",
     "login: All login tests",
     "login_success: Login tests with a user who is not locked out.",
+    "login_lockedout: Login tests with a user who is locked out.",
+    "login_incorrect: Login tests with incorrect login credentials.",
+    "login_nousername: Login tests with no username provided.",
+    "login_nopassword: Login tests with no password provided.",
+    "plp_images: Tests the images on the PLP (product listing page)",
+    "product_page: All product page related tests.",
+    "product_sort: All product page tests related to sorting."
 ]
