@@ -1,12 +1,28 @@
-import pytest
-from saucedemo.config.browser import get_browser
 import allure
+import pytest
+
+from saucedemo.config.browser import get_browser
 
 
 def pytest_addoption(parser):
-    parser.addoption("--browser", action="store", default="chrome", help="Browser to run tests on (chrome, firefox, etc.)")
-    parser.addoption("--headless", action="store_true", default=False, help="Run tests in headless mode")
-    parser.addoption("--mobile", action="store", default=None, help="Emulate mobile device (e.g., iPhone X)")
+    parser.addoption(
+        "--browser",
+        action="store",
+        default="chrome",
+        help="Browser to run tests on (chrome, firefox, etc.)",
+    )
+    parser.addoption(
+        "--headless",
+        action="store_true",
+        default=False,
+        help="Run tests in headless mode",
+    )
+    parser.addoption(
+        "--mobile",
+        action="store",
+        default=None,
+        help="Emulate mobile device (e.g., iPhone X)",
+    )
 
 
 @pytest.fixture(scope="class")
@@ -32,7 +48,11 @@ def test_failed_check(request):
     elif request.node.rep_setup.passed:
         if request.node.rep_call.failed:
             driver = request.node.funcargs["init_driver"]
-            allure.attach(driver.get_screenshot_as_png(), name="screenshot", attachment_type=allure.attachment_type.PNG)
+            allure.attach(
+                driver.get_screenshot_as_png(),
+                name="screenshot",
+                attachment_type=allure.attachment_type.PNG,
+            )
             print("executing test failed", request.node.nodeid)
 
 

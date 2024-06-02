@@ -1,6 +1,7 @@
 import json
-import pytest
+
 import allure
+import pytest
 
 from saucedemo.config.settings import settings
 from saucedemo.pages.login_page import LoginPage
@@ -37,7 +38,10 @@ class TestLogin(BaseTest):
         login_page.set_username(locked_out_user.get("username"))
         login_page.set_password(locked_out_user.get("password"))
         login_page.click_login()
-        assert login_page.get_error_message_text() == "Epic sadface: Sorry, this user has been locked out."
+        assert (
+            login_page.get_error_message_text()
+            == "Epic sadface: Sorry, this user has been locked out."
+        )
 
     @pytest.mark.parametrize(
         "username, password",
@@ -46,9 +50,9 @@ class TestLogin(BaseTest):
             for c in [
                 *credentials.get("invalid_user_name"),
                 *credentials.get("invalid_password"),
-                *credentials.get("invalid_user_name_and_password")
+                *credentials.get("invalid_user_name_and_password"),
             ]
-        ]
+        ],
     )
     @pytest.mark.login
     @pytest.mark.login_incorrect
@@ -60,4 +64,7 @@ class TestLogin(BaseTest):
         login_page.set_username(username)
         login_page.set_password(password)
         login_page.click_login()
-        assert login_page.get_error_message_text() == "Epic sadface: Username and password do not match any user in this service"
+        assert (
+            login_page.get_error_message_text()
+            == "Epic sadface: Username and password do not match any user in this service"
+        )

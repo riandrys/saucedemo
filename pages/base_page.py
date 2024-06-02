@@ -1,6 +1,5 @@
 from selenium.webdriver import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class BasePage:
@@ -12,7 +11,6 @@ class BasePage:
         self.get_element(by_locator).click()
 
     def get_element(self, by_locator: tuple[str, str]):
-        # return self._driver_wait.until(EC.presence_of_element_located(by_locator))
         return self._driver.find_element(*by_locator)
 
     def do_send_keys(self, by_locator: tuple[str, str], text: str):

@@ -18,8 +18,7 @@ class BaseConfig(BaseSettings):
         return os.path.join(self.data_dir, "credentials.json")
 
     model_config = SettingsConfigDict(
-        env_file=os.path.join(BASE_DIR, ".env"),
-        env_file_encoding='utf-8'
+        env_file=os.path.join(BASE_DIR, ".env"), env_file_encoding="utf-8"
     )
 
 
