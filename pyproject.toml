@@ -4,7 +4,8 @@ addopts = "--html=reports/report.html --alluredir=reports/allure-results"
 env_files = [".env"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "add_cart: Tests adding products to the cart.",
+    "add_to_cart: Tests adding products to the cart.",
+    "remove_from_cart: Tests removing products from the cart.",
     "full_checkout: Tests that run a full start-to-finish checkout.",
     "login: All login tests",
     "login_success: Login tests with a user who is not locked out.",

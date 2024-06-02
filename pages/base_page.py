@@ -1,3 +1,4 @@
+from selenium.common import NoSuchElementException
 from selenium.webdriver import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -13,6 +14,9 @@ class BasePage:
     def get_element(self, by_locator: tuple[str, str]):
         return self._driver.find_element(*by_locator)
 
+    def get_elements(self, by_locator: tuple[str, str]):
+        return self._driver.find_elements(*by_locator)
+
     def do_send_keys(self, by_locator: tuple[str, str], text: str):
         element = self.get_element(by_locator)
         element.clear()
@@ -27,8 +31,20 @@ class BasePage:
         return element.text
 
     def is_visible(self, by_locator: tuple[str, str]):
-        element = self.get_element(by_locator)
-        return bool(element)
+        try:
+            element = self.get_element(by_locator)
+        except NoSuchElementException:
+            return False
+        else:
+            return element.is_displayed()
+
+    def is_present(self, by_locator: tuple[str, str]):
+        try:
+            self.get_element(by_locator)
+        except NoSuchElementException:
+            return False
+        else:
+            return True
 
     def open(self, url):
         self._driver.get(url)

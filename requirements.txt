@@ -1,5 +1,4 @@
 selenium
-webdriver-manager
 pytest
 pytest-dotenv
 pytest-xdist
