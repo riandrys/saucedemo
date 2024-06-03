@@ -71,7 +71,7 @@ PASSWORD=your_password
 
 You can copy the `.env.example`
 ```shell
-cp .env.example .env
+cp .env.example .env   # On Windows use `copy .env.example .env`
 ```
 
 ## Running the Tests
