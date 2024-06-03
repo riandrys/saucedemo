@@ -15,5 +15,7 @@ markers = [
     "login_missing_password: Login tests with no password provided.",
     "plp_images: Tests the images on the PLP (product listing page)",
     "product_page: All product page related tests.",
-    "product_sort: All product page tests related to sorting."
+    "product_sort: All product page tests related to sorting.",
+    "plp_links: Tests the links on the PLP (product listing page).",
+    "plp_prices: Tests the prices on the PLP (product listing page)."
 ]

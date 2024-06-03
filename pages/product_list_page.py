@@ -34,6 +34,10 @@ class ProductListPage(BasePage):
             "select[data-test='product-sort-container']",
         )
         self.product_image_selector = (By.XPATH, ".//div[1]/a/img")
+        self.product_link_selector = (
+            By.CSS_SELECTOR,
+            ".inventory_item .inventory_item_description a",
+        )
 
     def click_cart(self):
         self.do_click(self.cart_selector)
@@ -100,3 +104,23 @@ class ProductListPage(BasePage):
 
     def get_image_src(self, product: WebElement):
         return product.find_element(*self.product_image_selector).get_attribute("src")
+
+    def get_product_name(self, product: WebElement):
+        return product.find_element(*self.inventory_item_names_selector).text
+
+    def get_product_price(self, product: WebElement):
+        return product.find_element(*self.inventory_item_prices_selector).text
+
+    def get_product_by_name(self, name: str):
+        products = self.get_all_product_elements()
+        for product in products:
+            product_name = self.get_product_name(product)
+            if product_name == name:
+                return product
+        return None
+
+    def get_product_link(self, product: WebElement):
+        return product.find_element(*self.product_link_selector).get_attribute("href")
+
+    def open_product_detail(self, product: WebElement):
+        product.find_element(*self.product_link_selector).click()

@@ -38,22 +38,21 @@ def init_driver(request):
 
 
 # check if a test has failed
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture
 def test_failed_check(request):
     yield
     # request.node is an "item" because we use the default
     # "function" scope
     if request.node.rep_setup.failed:
         print("setting up a test failed!", request.node.nodeid)
-    elif request.node.rep_setup.passed:
-        if request.node.rep_call.failed:
-            driver = request.node.funcargs["init_driver"]
-            allure.attach(
-                driver.get_screenshot_as_png(),
-                name="screenshot",
-                attachment_type=allure.attachment_type.PNG,
-            )
-            print("executing test failed", request.node.nodeid)
+    elif request.node.rep_setup.passed and request.node.rep_call.failed:
+        driver = request.node.funcargs["init_driver"]
+        image = driver.get_screenshot_as_png()
+        allure.attach(
+            image,
+            name="screenshot",
+            attachment_type=allure.attachment_type.PNG,
+        )
 
 
 # set up a hook to be able to check if a test has failed

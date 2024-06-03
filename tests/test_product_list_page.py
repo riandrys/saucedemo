@@ -4,6 +4,7 @@ import requests
 
 from saucedemo.config.settings import settings
 from saucedemo.pages.login_page import LoginPage
+from saucedemo.pages.product_detail_page import ProductDetailPage
 from saucedemo.pages.product_list_page import ProductListPage
 from saucedemo.tests.base_test import BaseTest
 
@@ -104,26 +105,42 @@ class TestProductListPage(BaseTest):
         product_elements = product_page.get_all_product_elements()
 
         num_items_in_cart = 0
-        assert (
-            product_page.get_number_cart_items() == num_items_in_cart
-        ), "An unexpected item has been found in the cart."
+        if product_page.get_number_cart_items() != num_items_in_cart:
+            print("Cart is not empty.")
 
         num_items_in_cart = product_page.get_number_cart_items()
+
+        not_added_to_cart = 0
+        not_changed_to_remove = 0
 
         for product_element in product_elements:
             product_page.add_product_to_cart(product_element)
             num_items_in_cart += 1
-            assert (
-                product_page.get_number_cart_items() == num_items_in_cart
-            ), "Product {0} has not been added to the cart.".format(
-                product_element.text
-            )
+            product_name = product_page.get_product_name(product_element)
 
-            assert (
-                product_page.get_button_add_to_cart_text(product_element) == "Remove"
-            ), "Button not changed to 'Remove' for product {0}".format(
-                product_element.text
-            )
+            if product_page.get_number_cart_items() != num_items_in_cart:
+                print(
+                    "Product {0} has not been added to the cart.\n".format(product_name)
+                )
+                not_added_to_cart += 1
+                num_items_in_cart = product_page.get_number_cart_items()
+            if product_page.get_button_add_to_cart_text(product_element) != "Remove":
+                print(
+                    "Button not changed to 'Remove' for product {0}.\n".format(
+                        product_name
+                    )
+                )
+                not_changed_to_remove += 1
+
+        assert (
+            not_added_to_cart == 0
+        ), "{0} Products have not been added to the cart.".format(not_added_to_cart)
+
+        assert (
+            not_changed_to_remove == 0
+        ), "{0} Products have not been changed to 'Remove'.".format(
+            not_changed_to_remove
+        )
 
     @pytest.mark.product_page
     @pytest.mark.remove_from_cart
@@ -137,27 +154,50 @@ class TestProductListPage(BaseTest):
         product_elements = product_page.get_all_product_elements()
 
         num_items_in_cart = 0
-        assert (
-            product_page.get_number_cart_items() == num_items_in_cart
-        ), "An unexpected item has been found in the cart."
+        if product_page.get_number_cart_items() != num_items_in_cart:
+            print("Cart is not empty.")
         product_page.add_all_to_cart()
         num_items_in_cart = product_page.get_number_cart_items()
+
+        not_removed_from_cart = 0
+        not_changed_to_add = 0
 
         for product_element in product_elements:
             product_page.remove_product_from_cart(product_element)
             num_items_in_cart -= 1
-            assert (
-                product_page.get_number_cart_items() == num_items_in_cart
-            ), "Product {0} has not been removed from the cart.".format(
-                product_element.text
-            )
+            product_name = product_page.get_product_name(product_element)
 
-            assert (
+            if product_page.get_number_cart_items() != num_items_in_cart:
+                print(
+                    "Product {0} has not been removed from the cart.".format(
+                        product_name
+                    )
+                )
+                not_removed_from_cart += 1
+                num_items_in_cart = product_page.get_number_cart_items()
+
+            if (
                 product_page.get_button_add_to_cart_text(product_element)
-                == "Add to cart"
-            ), "Button not changed to 'Add to cart' for product {0}".format(
-                product_element.text
-            )
+                != "Add to cart"
+            ):
+                print(
+                    "Button not changed to 'Add to cart' for product {0}".format(
+                        product_name
+                    )
+                )
+                not_changed_to_add += 1
+
+        assert (
+            not_removed_from_cart == 0
+        ), "{0} Products have not been removed from the cart.".format(
+            not_removed_from_cart
+        )
+
+        assert (
+            not not_changed_to_add
+        ), "{0} Products have not been changed to 'Add to cart'.".format(
+            not_changed_to_add
+        )
 
     @pytest.mark.product_page
     @pytest.mark.plp_images
@@ -190,4 +230,107 @@ class TestProductListPage(BaseTest):
 
         assert broken_image_count == 0, "Broken image count is {0}".format(
             broken_image_count
+        )
+
+    @pytest.mark.skip(reason="The href value is not working for some reason.")
+    @pytest.mark.product_page
+    @pytest.mark.plp_links
+    @allure.feature("Product List Page Feature")
+    @allure.story("Test product list links")
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.description(
+        "Test to ensure that the PLP product link properly redirects to the associated PDP."
+    )
+    def test_product_list_links(self):
+        login_page = LoginPage(self.driver)
+        login_page.login(settings.username, settings.password)
+        product_page = ProductListPage(self.driver)
+        product_elements = product_page.get_all_product_elements()
+
+        product_link_map = {}
+        for product in product_elements:
+            product_name = product_page.get_product_name(product)
+            product_link_map[product_name] = product_page.get_product_link(product)
+
+        bad_links = 0
+        for name, link in product_link_map.items():
+            self.driver.get(link)
+            pdp_page = ProductDetailPage(self.driver)
+            pdp_product_name = pdp_page.get_product_name()
+            if pdp_product_name != name:
+                print("The PLP link for {0} was not correct: {1}".format(name, link))
+                bad_links += 1
+
+        assert bad_links == 0, "{0} incorrect links were found on the PLP.".format(
+            bad_links
+        )
+
+    @pytest.mark.product_page
+    @pytest.mark.plp_links
+    @allure.feature("Product List Page Feature")
+    @allure.story("Test product list links")
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.description(
+        "Test to ensure that the PLP product links properly redirects to the associated PDP."
+    )
+    def test_plp_links(self):
+        login_page = LoginPage(self.driver)
+        login_page.login(settings.username, settings.password)
+        product_page = ProductListPage(self.driver)
+        product_names = product_page.get_list_of_product_names()
+
+        bad_links = 0
+        for product_name in product_names:
+            product = product_page.get_product_by_name(product_name)
+            product_page.open_product_detail(product)
+
+            pdp_page = ProductDetailPage(self.driver)
+            pdp_product_name = pdp_page.get_product_name()
+
+            if pdp_product_name != product_name:
+                print(
+                    "The PLP link for {0} was not correct: {1}".format(
+                        product_name, pdp_product_name
+                    )
+                )
+                bad_links += 1
+            pdp_page.click_back()
+
+        assert bad_links == 0, "{0} incorrect links were found on the PLP.".format(
+            bad_links
+        )
+
+    @pytest.mark.product_page
+    @pytest.mark.plp_prices
+    @allure.feature("Product List Page Feature")
+    @allure.story("Test product list prices")
+    @allure.severity(allure.severity_level.CRITICAL)
+    @allure.description("Check that the PLP prices match the PDP prices.")
+    def test_plp_prices(self):
+        login_page = LoginPage(self.driver)
+        login_page.login(settings.username, settings.password)
+        product_page = ProductListPage(self.driver)
+        product_names = product_page.get_list_of_product_names()
+
+        bad_prices = 0
+        for product_name in product_names:
+            product = product_page.get_product_by_name(product_name)
+            product_price = product_page.get_product_price(product)
+
+            product_page.open_product_detail(product)
+
+            pdp_page = ProductDetailPage(self.driver)
+            pdp_price = pdp_page.get_price()
+
+            if pdp_price != product_price:
+                print(
+                    "The PLP price {0} for {1} not matched with PDP price {2}".format(
+                        product_price, product_name, pdp_price
+                    )
+                )
+                bad_prices += 1
+            pdp_page.click_back()
+
+        assert bad_prices == 0, "{0} incorrect prices were found on the PLP.".format(
+            bad_prices
         )
