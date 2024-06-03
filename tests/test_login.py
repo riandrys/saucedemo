@@ -104,3 +104,16 @@ class TestLogin(BaseTest):
         assert (
             login_page.get_error_message_text() == "Epic sadface: Password is required"
         )
+
+    @pytest.mark.login
+    @pytest.mark.login_missing_username_and_password
+    @allure.feature("Login Feature")
+    @allure.story("Login with missing password")
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_login_missing_username_and_password(self):
+        login_page = LoginPage(self.driver)
+        login_page.login("", "")
+        assert (
+            login_page.get_error_message_text()
+            == "Epic sadface: Username and Password are required"
+        )
